@@ -11,9 +11,9 @@ Built as a lightweight, modular system for the Odoo Hackathon.
 ```text
 Transit-Ops/
 ├── backend/
-│   ├── server.js          # Express backend serving dashboard/vehicles/drivers APIs
+│   ├── server.js          # Express backend serving auth/vehicles/drivers/trips/maintenance/fuel/expenses APIs
 │   ├── db.sql             # PostgreSQL database schema & constraints
-│   ├── seed.js            # Initial mock database seed script
+│   ├── seed.js             # Initial mock database seed script
 │   ├── package.json       # Node.js backend dependencies
 │   └── package-lock.json
 ├── frontend/
@@ -21,7 +21,7 @@ Transit-Ops/
 │   ├── css/
 │   │   └── style.css      # Custom styling, Light/Dark theme configuration
 │   └── js/
-│       └── app.js         # Frontend controller, LocalStorage engine & Business logic
+│       └── app.js         # Frontend controller & API integration layer
 └── README.md              # Project documentation (this file)
 ```
 
@@ -36,7 +36,7 @@ Transit-Ops/
 - **Maintenance Logs**: Creates maintenance records, takes vehicles "In Shop", resolves repairs, and logs maintenance cost receipts.
 - **Financial Refills & Expenses**: Log general expenses (tolls, insurance, maintenance, other) and fuel refill volumes.
 - **Business Intelligence**: Computes overall fuel efficiency, operating costs, and calculates individual vehicle ROI: `[Revenue - (Maintenance + Fuel)] / Acquisition Cost`.
-- **Role-Based Access Control (RBAC)**: Adjusts navigation views and controls based on login credentials.
+- **Role-Based Access Control (RBAC)**: Enforced both client-side (UI visibility per role) and server-side (API routes reject unauthorized roles).
 - **Aesthetics & Dark Mode**: Modern slate-indigo theme supporting instant light/dark toggle and CSV exports.
 
 ---
@@ -65,22 +65,23 @@ Transit-Ops/
    ```bash
    psql -U postgres -d transitops -f backend/db.sql
    ```
-4. Install dependencies and run the seed script:
+4. (Optional) Copy `.env.example` to `.env` and adjust DB/JWT settings if not using the local defaults.
+5. Install dependencies and run the seed script:
    ```bash
    cd backend
    npm install
-   node seed.js
+   npm run seed
    ```
-5. Start the API server:
+6. Start the API server:
    ```bash
-   node server.js
+   npm start
    ```
    *(Runs on http://localhost:3000)*
 
 ### Frontend (Vanilla HTML/CSS/JS)
-- The frontend is **completely serverless & client-side**. 
-- Simply double-click **`frontend/index.html`** to open the app in any browser.
-- **Note**: The frontend has an offline-first fallback. If your backend/PostgreSQL is not running, the application will initialize and run in local storage mock mode with all business rules fully interactive.
+- The frontend is a single-page app served directly by the Express backend.
+- Open `http://localhost:3000` in your browser once the backend is running.
+- **Note**: A live connection to the backend API is required — login and all data (vehicles, drivers, trips, maintenance, fuel, expenses) are served from PostgreSQL.
 
 ---
 
@@ -94,4 +95,3 @@ Log in using any of the pre-seeded accounts:
 | `driver@transitops.com` | `password123` | Driver Dispatch | Create/complete trips, log fuel, log tolls (No reports) |
 | `safety@transitops.com` | `password123` | Safety Officer | Manage driver directory, safety scores & compliance alerts |
 | `finance@transitops.com` | `password123` | Financial Analyst | View expenses, fuel logs, and fleet ROI data (No CRUD writes) |
- 
